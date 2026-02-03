@@ -1,5 +1,18 @@
 # المؤذن - تطبيق Android (ALmuadhin Android App)
 
+<img src="ALmuadhin-App.png" width="100%" />
+
+<div align="center">
+  <img src="https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=kotlin&logoColor=white" />
+  <img src="https://img.shields.io/badge/Jetpack%20Compose-4285F4?style=for-the-badge&logo=android&logoColor=white" />
+  <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=android&logoColor=white" />
+  <img src="https://img.shields.io/badge/Hilt-2C3E50?style=for-the-badge&logo=google&logoColor=white" />
+  <img src="https://img.shields.io/badge/Room-4479A1?style=for-the-badge&logo=sqlite&logoColor=white" />
+  <img src="https://img.shields.io/badge/Retrofit-3C3C3C?style=for-the-badge&logo=square&logoColor=white" />
+  <img src="https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black" />
+  <img src="https://img.shields.io/badge/Google%20AdMob-4285F4?style=for-the-badge&logo=google-ads&logoColor=white" />
+</div>
+
 تطبيق إسلامي شامل لمواقيت الصلاة والأذكار واتجاه القبلة والتقويم الهجري.
 
 ---
