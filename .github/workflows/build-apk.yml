@@ -1,25 +1,31 @@
-name: Build APK
+name: Build Android APK (Kotlin)
 
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch:
+  workflow_dispatch:  # يسمح بالتشغيل اليدوي
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-      - uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.x'
-      - run: flutter pub get
-      - run: flutter build apk --debug
-      - uses: actions/upload-artifact@v4
-        with:
-          name: mohamed-abdelazim-app
-          path: build/app/outputs/flutter-apk/*.apk
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+
+    - name: Build Release APK
+      run: ./gradlew :app:assembleRelease
+
+    - name: Upload APK as artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ALmuadhin-App
+        path: app/build/outputs/apk/release/*.apk
