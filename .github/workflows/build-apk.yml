@@ -3,7 +3,7 @@ name: Build Android APK (Kotlin)
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch:  # يسمح بالتشغيل اليدوي
+  workflow_dispatch:
 
 jobs:
   build:
