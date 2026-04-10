@@ -32,7 +32,8 @@ data class UserSettings(
     val adsRemoved: Boolean = false,
     val adCooldownMinutes: Int = 0,
     val adhanSound: AdhanSound = AdhanSound.MAKKAH,
-    val playFullAdhan: Boolean = false
+    val playFullAdhan: Boolean = false,
+    val silentFajr: Boolean = false
 )
 
 data class PrayerDay(
