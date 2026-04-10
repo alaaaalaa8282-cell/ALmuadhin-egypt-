@@ -1,21 +1,23 @@
 package com.example.almuadhin.alarm
 
+import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.media.RingtoneManager
-import android.net.Uri
+import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.almuadhin.R
 import com.example.almuadhin.data.AdhanSound
 
 class AlarmReceiver : BroadcastReceiver() {
+
     override fun onReceive(context: Context, intent: Intent) {
         val title = intent.getStringExtra(EXTRA_TITLE) ?: context.getString(R.string.notif_prayer_title)
         val body = intent.getStringExtra(EXTRA_BODY) ?: context.getString(R.string.notif_prayer_body)
         val adhanSoundName = intent.getStringExtra(EXTRA_ADHAN_SOUND) ?: AdhanSound.MAKKAH.name
-        
+        val notifId = intent.getIntExtra(EXTRA_ID, 1001)
+
         val adhanSound = try {
             AdhanSound.valueOf(adhanSoundName)
         } catch (e: Exception) {
@@ -24,27 +26,52 @@ class AlarmReceiver : BroadcastReceiver() {
 
         NotificationHelper.ensureChannels(context, adhanSound)
 
+        // Intent لفتح التطبيق
         val openIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-        val pi = android.app.PendingIntent.getActivity(
-            context,
-            0,
-            openIntent,
-            android.app.PendingIntent.FLAG_UPDATE_CURRENT or android.app.PendingIntent.FLAG_IMMUTABLE
+        val pi = PendingIntent.getActivity(
+            context, 0, openIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        
+
+        // Intent لإغلاق الإشعار
+        val dismissIntent = Intent(context, DismissReceiver::class.java).apply {
+            putExtra(EXTRA_ID, notifId)
+        }
+        val dismissPi = PendingIntent.getBroadcast(
+            context, notifId, dismissIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Full Screen Intent
+        val fullScreenPi = PendingIntent.getActivity(
+            context, notifId + 100, openIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
         val soundUri = NotificationHelper.getAdhanSoundUri(context, adhanSound)
+
+        // صورة والدك كـ Large Icon
+        val largeBitmap = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
 
         val notif = NotificationCompat.Builder(context, NotificationHelper.CHANNEL_PRAYER)
             .setSmallIcon(R.drawable.ic_notification)
+            .setLargeIcon(largeBitmap)
             .setContentTitle(title)
             .setContentText(body)
             .setContentIntent(pi)
-            .setAutoCancel(true)
+            .setAutoCancel(false)
+            .setOngoing(true)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setSound(soundUri)
+            .setFullScreenIntent(fullScreenPi, true)
+            .addAction(
+                R.drawable.ic_notification,
+                "إغلاق الأذان",
+                dismissPi
+            )
             .build()
 
-        NotificationManagerCompat.from(context).notify(intent.getIntExtra(EXTRA_ID, 1001), notif)
+        NotificationManagerCompat.from(context).notify(notifId, notif)
     }
 
     companion object {
