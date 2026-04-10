@@ -26,31 +26,26 @@ class AlarmReceiver : BroadcastReceiver() {
 
         NotificationHelper.ensureChannels(context, adhanSound)
 
-        // Intent لفتح التطبيق
         val openIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
         val pi = PendingIntent.getActivity(
             context, 0, openIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Intent لإغلاق الإشعار
-        val dismissIntent = Intent(context, DismissReceiver::class.java).apply {
-            putExtra(EXTRA_ID, notifId)
-        }
+        val dismissIntent = Intent(context, DismissReceiver::class.java)
+        dismissIntent.putExtra(EXTRA_ID, notifId)
         val dismissPi = PendingIntent.getBroadcast(
-            context, notifId, dismissIntent,
+            context, notifId,
+            dismissIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // Full Screen Intent
         val fullScreenPi = PendingIntent.getActivity(
             context, notifId + 100, openIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
         val soundUri = NotificationHelper.getAdhanSoundUri(context, adhanSound)
-
-        // صورة والدك كـ Large Icon
         val largeBitmap = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
 
         val notif = NotificationCompat.Builder(context, NotificationHelper.CHANNEL_PRAYER)
@@ -64,11 +59,7 @@ class AlarmReceiver : BroadcastReceiver() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setSound(soundUri)
             .setFullScreenIntent(fullScreenPi, true)
-            .addAction(
-                R.drawable.ic_notification,
-                "إغلاق الأذان",
-                dismissPi
-            )
+            .addAction(0, "إغلاق الأذان", dismissPi)
             .build()
 
         NotificationManagerCompat.from(context).notify(notifId, notif)
