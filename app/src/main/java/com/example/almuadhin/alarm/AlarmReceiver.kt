@@ -40,10 +40,6 @@ val isSilent = intent.getBooleanExtra(EXTRA_IS_SILENT, false)
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        val fullScreenPi = PendingIntent.getActivity(
-            context, notifId + 100, openIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
 
         val soundUri = NotificationHelper.getAdhanSoundUri(context, adhanSound)
         val largeBitmap = BitmapFactory.decodeResource(context.resources, R.mipmap.ic_launcher)
@@ -61,8 +57,6 @@ val isSilent = intent.getBooleanExtra(EXTRA_IS_SILENT, false)
             .setFullScreenIntent(fullScreenPi, true)
             .addAction(0, "إغلاق الأذان", dismissPi)
             .build()
-
-        NotificationManagerCompat.from(context).notify(notifId, notif)
         
     }
 
