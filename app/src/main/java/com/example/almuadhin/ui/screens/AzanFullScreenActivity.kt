@@ -12,7 +12,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.almuadhin.R
 import com.example.almuadhin.alarm.AzanMediaPlayer
-
+import androidx.core.app.NotificationManagerCompat
 class AzanFullScreenActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,10 +48,13 @@ class AzanFullScreenActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.tvPrayerName).text = prayerName
 
         findViewById<Button>(R.id.btnDismiss).setOnClickListener {
-            AzanMediaPlayer.player?.stop()
-            AzanMediaPlayer.player?.release()
-            AzanMediaPlayer.player = null
-            finish()
+    AzanMediaPlayer.player?.stop()
+    AzanMediaPlayer.player?.release()
+    AzanMediaPlayer.player = null
+    val notifId = intent.getIntExtra("notif_id", 1001)
+    NotificationManagerCompat.from(this).cancel(notifId)
+    finish()
+}
         }
     }
 }
