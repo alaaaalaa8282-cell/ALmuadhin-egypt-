@@ -415,7 +415,40 @@ fun SettingsScreen(
                     }
                 }
             }
-
+Silent Fajr Setting
+            item {
+                SettingsCard(
+                    title = "إعداد الفجر",
+                    icon = Icons.Default.NightlightRound
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Column {
+                            Text(
+                                "الفجر بدون أذان",
+                                style = MaterialTheme.typography.bodyMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                "إشعار صامت لصلاة الفجر",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        Switch(
+                            checked = s.silentFajr,
+                            onCheckedChange = { vm.setSilentFajr(it) },
+                            colors = SwitchDefaults.colors(
+                                checkedThumbColor = Color.White,
+                                checkedTrackColor = MaterialTheme.colorScheme.primary
+                            )
+                        )
+                    }
+                }
+            }
             // Ads Settings
             item {
                 SettingsCard(
