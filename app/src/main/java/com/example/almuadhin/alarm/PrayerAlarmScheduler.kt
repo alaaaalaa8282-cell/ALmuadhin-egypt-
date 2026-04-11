@@ -48,8 +48,7 @@ class PrayerAlarmScheduler @Inject constructor(
 
     fun cancelAll() {
         for (id in 2001..2005) {
-            // Sound name doesn't matter for cancellation by ID
-            val pi = pendingIntent(id, "Prayer", "Prayer", "MAKKAH")
+            val pi = pendingIntent(id, "Prayer", "Prayer", "MAKKAH", false)
             alarmManager.cancel(pi)
         }
     }
@@ -58,11 +57,9 @@ class PrayerAlarmScheduler @Inject constructor(
         val triggerAt = TimeUtils.toMillis(date, time, zoneId)
         val now = System.currentTimeMillis()
         val actualTrigger = if (triggerAt <= now) {
-            // If time passed, schedule for next day
             TimeUtils.toMillis(date.plusDays(1), time, zoneId)
         } else triggerAt
 
-        // Arabic prayer names
         val arabicName = when (prayerName) {
             "Fajr" -> "الفجر"
             "Dhuhr" -> "الظهر"
@@ -72,12 +69,14 @@ class PrayerAlarmScheduler @Inject constructor(
             else -> prayerName
         }
 
-val pi = pendingIntent(
-    id = id,
-    title = "حان وقت صلاة $arabicName",
-    body = "الوقت: $time",
-    adhanSoundName = adhanSoundName,
-    isSilent = prayerName == "Fajr"
+        val isSilent = prayerName == "Fajr"
+
+        val pi = pendingIntent(
+            id = id,
+            title = "حان وقت صلاة $arabicName",
+            body = "الوقت: $time",
+            adhanSoundName = adhanSoundName,
+            isSilent = isSilent
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -87,13 +86,13 @@ val pi = pendingIntent(
         }
     }
 
-private fun pendingIntent(id: Int, title: String, body: String, adhanSoundName: String, isSilent: Boolean = false,
+    private fun pendingIntent(id: Int, title: String, body: String, adhanSoundName: String, isSilent: Boolean): PendingIntent {
         val intent = Intent(context, AlarmReceiver::class.java).apply {
             putExtra(AlarmReceiver.EXTRA_ID, id)
             putExtra(AlarmReceiver.EXTRA_TITLE, title)
+            putExtra(AlarmReceiver.EXTRA_BODY, body)
             putExtra(AlarmReceiver.EXTRA_ADHAN_SOUND, adhanSoundName)
             putExtra(AlarmReceiver.EXTRA_IS_SILENT, isSilent)
-
         }
         return PendingIntent.getBroadcast(
             context,
