@@ -34,7 +34,7 @@ object NotificationHelper {
             NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = "تنبيهات مواقيت الصلاة"
-            setSound(adhanSoundUri, audioAttributes)
+            setSound(null, null)
             enableVibration(true)
             vibrationPattern = longArrayOf(0, 500, 200, 500)
         }
