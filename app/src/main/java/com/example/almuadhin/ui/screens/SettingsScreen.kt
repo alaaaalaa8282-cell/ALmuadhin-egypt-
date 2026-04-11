@@ -1,4 +1,4 @@
-package com.example.almuadhin.ui.screens
+9package com.example.almuadhin.ui.screens
 
 import android.Manifest
 import android.content.Intent
@@ -415,7 +415,7 @@ fun SettingsScreen(
                     }
                 }
             }
-Silent Fajr Setting
+// Silent Fajr Setting
             item {
                 SettingsCard(
                     title = "إعداد الفجر",
