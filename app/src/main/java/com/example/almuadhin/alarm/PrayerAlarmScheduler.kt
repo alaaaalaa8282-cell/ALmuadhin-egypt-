@@ -113,5 +113,28 @@ class PrayerAlarmScheduler @Inject constructor(
         val day = stored.second
         scheduleForToday(day, settings.adhanSound.name, silentFajr = settings.silentFajr)
     }
+fun scheduleSalah(intervalMinutes: Int) {
+    val intent = Intent(context, SalahReceiver::class.java)
+    val pi = PendingIntent.getBroadcast(
+        context, 9000, intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+    val intervalMs = intervalMinutes * 60 * 1000L
+    alarmManager.setRepeating(
+        AlarmManager.RTC_WAKEUP,
+        System.currentTimeMillis() + intervalMs,
+        intervalMs,
+        pi
+    )
+}
+
+fun cancelSalah() {
+    val intent = Intent(context, SalahReceiver::class.java)
+    val pi = PendingIntent.getBroadcast(
+        context, 9000, intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
+    alarmManager.cancel(pi)
+}
 }
 
