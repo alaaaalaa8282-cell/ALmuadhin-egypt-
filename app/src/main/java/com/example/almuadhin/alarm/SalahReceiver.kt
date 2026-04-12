@@ -9,8 +9,10 @@ import androidx.core.app.NotificationManagerCompat
 import com.example.almuadhin.R
 import com.example.almuadhin.data.SettingsRepository
 import com.example.almuadhin.data.SalahSound
+import com.example.almuadhin.data.UserSettings
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -20,8 +22,10 @@ class SalahReceiver : BroadcastReceiver() {
     lateinit var settingsRepository: SettingsRepository
 
     override fun onReceive(context: Context, intent: Intent) {
-        val settings = runBlocking { settingsRepository.settingsFlow.first() }
-        val soundResId = settings.salahSound.resId
+        val settings: UserSettings = runBlocking {
+            settingsRepository.settingsFlow.first()
+        }
+        val soundResId: Int = settings.salahSound.resId
 
         val mp = MediaPlayer.create(context, soundResId)
         mp?.start()
