@@ -13,6 +13,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+import com.example.almuadhin.alarm.AzanMediaPlayer
 
 @AndroidEntryPoint
 class SalahReceiver : BroadcastReceiver() {
@@ -25,6 +26,8 @@ class SalahReceiver : BroadcastReceiver() {
 
         if (!settings.salahEnabled) return
 
+        if (AzanMediaPlayer.player?.isPlaying == true) return
+       
         // شغل الصوت
         context.startService(Intent(context, SalahSoundService::class.java))
 
