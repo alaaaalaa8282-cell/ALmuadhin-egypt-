@@ -63,10 +63,9 @@ class SettingsRepository @Inject constructor(
                 ?: AdhanSound.MAKKAH,
           salahEnabled = prefs[Keys.SALAH_ENABLED] ?: false,
            salahInterval = prefs[Keys.SALAH_INTERVAL] ?: 30,
-            playFullAdhan = prefs[Keys.PLAY_FULL_ADHAN] ?: false,
-          salahSound = prefs[Keys.SALAH_SOUND]
-    ?.let { runCatching { SalahSound.valueOf(it) }.getOrNull() }
-    ?: SalahSound.NOZAKER, 
+            salahSound = runCatching {
+    prefs[Keys.SALAH_SOUND]?.let { SalahSound.valueOf(it) }
+}.getOrNull() ?: SalahSound.NOZAKER, 
             silentFajr = prefs[Keys.SILENT_FAJR] ?: false,
         )
     }
