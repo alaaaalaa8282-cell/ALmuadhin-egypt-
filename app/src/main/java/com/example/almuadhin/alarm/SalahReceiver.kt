@@ -3,33 +3,17 @@ package com.example.almuadhin.alarm
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.media.MediaPlayer
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.almuadhin.R
-import com.example.almuadhin.data.SettingsRepository
-import com.example.almuadhin.data.SalahSound
-import com.example.almuadhin.data.UserSettings
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.flow.first
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SalahReceiver : BroadcastReceiver() {
 
-    @Inject
-    lateinit var settingsRepository: SettingsRepository
-
     override fun onReceive(context: Context, intent: Intent) {
-        val settings: UserSettings = runBlocking {
-            settingsRepository.settingsFlow.first()
-        }
-        val soundResId: Int = settings.salahSound.resId
-
-        val mp = MediaPlayer.create(context, soundResId)
-        mp?.start()
-        mp?.setOnCompletionListener { it.release() }
+        val serviceIntent = Intent(context, SalahSoundService::class.java)
+        context.startService(serviceIntent)
 
         val notif = NotificationCompat.Builder(context, NotificationHelper.CHANNEL_AZKAR)
             .setSmallIcon(R.drawable.ic_notification)
