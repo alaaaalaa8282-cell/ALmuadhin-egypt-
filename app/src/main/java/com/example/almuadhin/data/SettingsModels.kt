@@ -38,7 +38,7 @@ data class UserSettings(
     val silentFajr: Boolean = false,
     val playFullAdhan: Boolean = false, 
     val salahEnabled: Boolean = false, 
-    val salahInterval: Int = 30
+    val salahInterval: Int = 30,
     val salahSound: SalahSound = SalahSound.NOZAKER,
 )
 data class PrayerDay(
