@@ -3,6 +3,7 @@ package com.example.almuadhin.ui.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.almuadhin.data.AdhanSound
+import com.example.almuadhin.data.SalahSound
 import com.example.almuadhin.data.CalculationMethod
 import com.example.almuadhin.data.LocationMode
 import com.example.almuadhin.data.SettingsRepository
@@ -39,5 +40,6 @@ class SettingsViewModel @Inject constructor(
     fun setPlayFullAdhan(playFull: Boolean) = viewModelScope.launch { repo.setPlayFullAdhan(playFull) }
    fun setSalahEnabled(enabled: Boolean) = viewModelScope.launch { repo.setSalahEnabled(enabled) }
     fun setSalahInterval(minutes: Int) = viewModelScope.launch { repo.setSalahInterval(minutes) }
+   fun setSalahSound(sound: SalahSound) = viewModelScope.launch { repo.setSalahSound(sound) }
     suspend fun current(): UserSettings = repo.settingsFlow.first()
 }
