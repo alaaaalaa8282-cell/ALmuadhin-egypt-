@@ -500,7 +500,46 @@ fun SettingsScreen(
          //   item {
         //        NoorSettingsCard()
         //    }
-
+// Salah Settings
+item {
+    SettingsCard(
+        title = "الصلاة على النبي ﷺ",
+        icon = Icons.Default.Favorite
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("تفعيل الصلاة على النبي")
+            Switch(
+                checked = s.salahEnabled,
+                onCheckedChange = {
+                    vm.setSalahEnabled(it)
+                    if (it) scheduler.scheduleSalah(s.salahInterval)
+                    else scheduler.cancelSalah()
+                },
+                colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.White,
+                    checkedTrackColor = MaterialTheme.colorScheme.primary
+                )
+            )
+        }
+        if (s.salahEnabled) {
+            Spacer(Modifier.height(8.dp))
+            Text("كل ${s.salahInterval} دقيقة")
+            Slider(
+                value = s.salahInterval.toFloat(),
+                onValueChange = {
+                    vm.setSalahInterval(it.toInt())
+                    scheduler.scheduleSalah(it.toInt())
+                },
+                valueRange = 10f..60f,
+                steps = 4
+            )
+        }
+    }
+}
             // App Info
             item {
                 SettingsCard(
