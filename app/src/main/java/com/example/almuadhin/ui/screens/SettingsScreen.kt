@@ -32,6 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.almuadhin.alarm.PrayerAlarmScheduler
 import com.example.almuadhin.data.AdhanSound
 import com.example.almuadhin.data.CalculationMethod
+import com.example.almuadhin.data.SalahSound
 import com.example.almuadhin.data.LocationMode
 import com.example.almuadhin.noor.config.ConfigManager
 import com.example.almuadhin.noor.data.ApiProvider
