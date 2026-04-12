@@ -537,6 +537,22 @@ item {
                 valueRange = 10f..60f,
                 steps = 4
             )
+     Spacer(Modifier.height(8.dp))
+Text("اختر الصوت")
+SalahSound.values().forEach { sound ->
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { vm.setSalahSound(sound) },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = s.salahSound == sound,
+            onClick = { vm.setSalahSound(sound) }
+        )
+        Text(sound.labelAr)
+    }
+}
         }
     }
 }
