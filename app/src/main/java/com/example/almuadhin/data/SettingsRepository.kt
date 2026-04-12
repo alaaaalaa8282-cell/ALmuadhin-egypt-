@@ -64,8 +64,8 @@ class SettingsRepository @Inject constructor(
           salahEnabled = prefs[Keys.SALAH_ENABLED] ?: false,
            salahInterval = prefs[Keys.SALAH_INTERVAL] ?: 30,
          salahSound = runCatching {
-                prefs[Keys.SALAH_SOUND]?.let { SalahSound.valueOf(it) }
-            }.getOrNull() ?: SalahSound.NOZAKER,
+            prefs[Keys.SALAH_SOUND]?.let { SalahSound.valueOf(it) }
+        }.getOrNull() ?: SalahSound.NOZAKER,
             silentFajr = prefs[Keys.SILENT_FAJR] ?: false,
         )
     }
@@ -80,7 +80,6 @@ class SettingsRepository @Inject constructor(
             prefs[Keys.MANUAL_COUNTRY] = next.manualCountry
             prefs[Keys.CALC_METHOD] = next.calculationMethod.name
             prefs[Keys.NOTIFICATIONS] = next.notificationsEnabled
-            prefs[Keys.SALAH_SOUND] = next.salahSound.name
             prefs[Keys.ADS_REMOVED] = next.adsRemoved
             prefs[Keys.SALAH_ENABLED] = next.salahEnabled
             prefs[Keys.SALAH_SOUND] = next.salahSound.name
