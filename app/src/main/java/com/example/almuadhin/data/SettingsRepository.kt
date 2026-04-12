@@ -83,6 +83,7 @@ class SettingsRepository @Inject constructor(
             prefs[Keys.SALAH_SOUND] = next.salahSound.name
             prefs[Keys.ADS_REMOVED] = next.adsRemoved
             prefs[Keys.SALAH_ENABLED] = next.salahEnabled
+            prefs[Keys.SALAH_SOUND] = next.salahSound.name
             prefs[Keys.SALAH_INTERVAL] = next.salahInterval
             prefs[Keys.AD_COOLDOWN_MIN] = next.adCooldownMinutes
             prefs[Keys.ADHAN_SOUND] = next.adhanSound.name
