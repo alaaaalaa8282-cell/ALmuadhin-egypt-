@@ -17,7 +17,9 @@ class SalahSoundService : Service() {
     @Inject
     lateinit var settingsRepository: SettingsRepository
 
-    private var mediaPlayer: MediaPlayer? = null
+    companion object {
+        var salahPlayer: MediaPlayer? = null
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val settings: UserSettings = runBlocking {
@@ -25,10 +27,12 @@ class SalahSoundService : Service() {
         }
         val soundResId: Int = settings.salahSound.resId
 
-        mediaPlayer = MediaPlayer.create(this, soundResId)
-        mediaPlayer?.start()
-        mediaPlayer?.setOnCompletionListener {
+        salahPlayer?.release()
+        salahPlayer = MediaPlayer.create(this, soundResId)
+        salahPlayer?.start()
+        salahPlayer?.setOnCompletionListener {
             it.release()
+            salahPlayer = null
             stopSelf()
         }
 
@@ -38,8 +42,8 @@ class SalahSoundService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
-        mediaPlayer?.release()
-        mediaPlayer = null
+        salahPlayer?.release()
+        salahPlayer = null
         super.onDestroy()
     }
 }
