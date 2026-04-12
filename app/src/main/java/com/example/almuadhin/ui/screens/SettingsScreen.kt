@@ -57,6 +57,8 @@ fun SettingsScreen(
     var mediaPlayer by remember { mutableStateOf<MediaPlayer?>(null) }
     var playingSound by remember { mutableStateOf<AdhanSound?>(null) }
 
+    var playingSalahSound by remember { mutableStateOf<SalahSound?>(null) }
+  
     DisposableEffect(Unit) {
         onDispose {
             mediaPlayer?.release()
@@ -544,7 +546,10 @@ SalahSound.values().forEach { sound ->
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { vm.setSalahSound(sound) },
+            .clickable { 
+        playingSalahSound = sound
+        vm.setSalahSound(sound) 
+   },
         verticalAlignment = Alignment.CenterVertically
     ) {
         RadioButton(
