@@ -34,6 +34,8 @@ data class UserSettings(
     val adhanSound: AdhanSound = AdhanSound.MAKKAH,
     val silentFajr: Boolean = false,
     val playFullAdhan: Boolean = false
+    val salahEnabled: Boolean = false
+ val salahInterval: Int = 30
 )
 data class PrayerDay(
     val imsak: String,
