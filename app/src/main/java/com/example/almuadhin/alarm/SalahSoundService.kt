@@ -79,26 +79,10 @@ class SalahSoundService : Service() {
             releaseAudioFocus()
             it.release()
             salahPlayer = null
-            scheduleNext(settings.salahInterval)
             stopSelf()
         }
 
         return START_NOT_STICKY
-    }
-
-    private fun scheduleNext(intervalMinutes: Int) {
-        val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
-        val intent = Intent(this, SalahReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            this, 9002, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val triggerAt = System.currentTimeMillis() + (intervalMinutes * 60 * 1000L)
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            triggerAt,
-            pendingIntent
-        )
     }
 
     private fun releaseAudioFocus() {
