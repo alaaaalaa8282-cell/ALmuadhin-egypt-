@@ -120,12 +120,11 @@ fun scheduleSalah(intervalMinutes: Int) {
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
     val intervalMs = intervalMinutes * 60 * 1000L
-    alarmManager.setRepeating(
-        AlarmManager.RTC_WAKEUP,
-        System.currentTimeMillis() + intervalMs,
-        intervalMs,
-        pi
-    )
+    alarmManager.setExactAndAllowWhileIdle(
+    AlarmManager.RTC_WAKEUP,
+    System.currentTimeMillis() + intervalMs,
+    pi
+)
 }
 
 fun cancelSalah() {
