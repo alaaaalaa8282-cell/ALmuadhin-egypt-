@@ -30,9 +30,6 @@ class SettingsRepository @Inject constructor(
         val ADHAN_SOUND = stringPreferencesKey("adhan_sound")
         val PLAY_FULL_ADHAN = booleanPreferencesKey("play_full_adhan")   
         val SILENT_FAJR = booleanPreferencesKey("silent_fajr")
-        val SALAH_ENABLED = booleanPreferencesKey("salah_enabled")
-        val SALAH_INTERVAL = intPreferencesKey("salah_interval")
-        val SALAH_SOUND = stringPreferencesKey("salah_sound")
         // Stored prayer times for rescheduling after reboot
         val LAST_DATE = stringPreferencesKey("last_prayer_date")
         val IMSAK = stringPreferencesKey("last_imsak")
@@ -43,6 +40,9 @@ class SettingsRepository @Inject constructor(
         val MAGHRIB = stringPreferencesKey("last_maghrib")
         val ISHA = stringPreferencesKey("last_isha")
         val TIMEZONE = stringPreferencesKey("last_timezone")
+        val SALAH_ENABLED = booleanPreferencesKey("salah_enabled")
+        val SALAH_INTERVAL = intPreferencesKey("salah_interval")
+        val SALAH_SOUND = stringPreferencesKey("salah_sound")
     }
 
     val settingsFlow: Flow<UserSettings> = context.dataStore.data.map { prefs ->
@@ -81,13 +81,13 @@ class SettingsRepository @Inject constructor(
             prefs[Keys.CALC_METHOD] = next.calculationMethod.name
             prefs[Keys.NOTIFICATIONS] = next.notificationsEnabled
             prefs[Keys.ADS_REMOVED] = next.adsRemoved
-            prefs[Keys.SALAH_ENABLED] = next.salahEnabled
-            prefs[Keys.SALAH_SOUND] = next.salahSound.name
-            prefs[Keys.SALAH_INTERVAL] = next.salahInterval
             prefs[Keys.AD_COOLDOWN_MIN] = next.adCooldownMinutes
             prefs[Keys.ADHAN_SOUND] = next.adhanSound.name
             prefs[Keys.PLAY_FULL_ADHAN] = next.playFullAdhan
             prefs[Keys.SILENT_FAJR] = next.silentFajr
+            prefs[Keys.SALAH_ENABLED] = next.salahEnabled
+            prefs[Keys.SALAH_SOUND] = next.salahSound.name
+            prefs[Keys.SALAH_INTERVAL] = next.salahInterval
         }
     }
 
