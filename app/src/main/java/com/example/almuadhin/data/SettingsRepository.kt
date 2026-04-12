@@ -30,8 +30,9 @@ class SettingsRepository @Inject constructor(
         val ADHAN_SOUND = stringPreferencesKey("adhan_sound")
         val PLAY_FULL_ADHAN = booleanPreferencesKey("play_full_adhan")   
         val SILENT_FAJR = booleanPreferencesKey("silent_fajr")
-       val SALAH_ENABLED = booleanPreferencesKey("salah_enabled")
+        val SALAH_ENABLED = booleanPreferencesKey("salah_enabled")
         val SALAH_INTERVAL = intPreferencesKey("salah_interval")
+        val SALAH_SOUND = stringPreferencesKey("salah_sound")
         // Stored prayer times for rescheduling after reboot
         val LAST_DATE = stringPreferencesKey("last_prayer_date")
         val IMSAK = stringPreferencesKey("last_imsak")
