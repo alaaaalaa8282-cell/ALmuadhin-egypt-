@@ -36,6 +36,7 @@ data class HomeUiState(
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
+  @dagger.hilt.android.qualifiers.ApplicationContext private val context: android.content.Context,
     private val settingsRepo: SettingsRepository,
     private val prayerRepo: PrayerRepository,
     private val locationRepo: LocationRepository,
