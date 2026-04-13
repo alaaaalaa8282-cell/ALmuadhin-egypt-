@@ -35,9 +35,10 @@ class AlarmReceiver : BroadcastReceiver() {
             mp?.isLooping = false
             mp?.start()
             AzanMediaPlayer.player = mp
-        }mp?.setOnCompletionListener {
-    it.release()
-    AzanMediaPlayer.player = null
+            mp?.setOnCompletionListener {
+                it.release()
+                AzanMediaPlayer.player = null
+            }
         }
 
         NotificationHelper.ensureChannels(context, adhanSound)
