@@ -23,15 +23,17 @@ class LocationRepository @Inject constructor(
 
     @SuppressLint("MissingPermission")
     suspend fun getLastKnownLocation(): android.location.Location? {
-        // أول حاجة جرب lastLocation
         return try {
-            val last = kotlinx.coroutines.tasks.await(fused.lastLocation)
-            if (last != null) {
-                last
-            } else {
-                // اطلب موقع جديد لو null
-                getCurrentLocation()
+            val task = fused.lastLocation
+            val last = suspendCancellableCoroutine<android.location.Location?> { cont ->
+                task.addOnSuccessListener { location ->
+                    cont.resume(location)
+                }
+                task.addOnFailureListener {
+                    cont.resume(null)
+                }
             }
+            if (last != null) last else getCurrentLocation()
         } catch (e: Exception) {
             getCurrentLocation()
         }
@@ -42,7 +44,11 @@ class LocationRepository @Inject constructor(
         suspendCancellableCoroutine { cont ->
             val request = LocationRequest.Builder(
                 Priority.PRIORITY_HIGH_ACCURACY, 5000L
-            ).setMaxUpdates(1).build()
+            )
+                .setMaxUpdates(1)
+                .setMinUpdateDistanceMeters(0f)
+                .setWaitForAccurateLocation(true)
+                .build()
 
             val callback = object : LocationCallback() {
                 override fun onLocationResult(result: LocationResult) {
@@ -56,6 +62,6 @@ class LocationRepository @Inject constructor(
             cont.invokeOnCancellation {
                 fused.removeLocationUpdates(callback)
             }
-        } // ← إغلاق suspendCancellableCoroutine
+        }
 
-} // ← إغلاق الكلاس
+}
