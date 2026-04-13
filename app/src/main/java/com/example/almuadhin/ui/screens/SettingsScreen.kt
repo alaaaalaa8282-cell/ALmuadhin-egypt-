@@ -213,7 +213,7 @@ fun SettingsScreen(
                         Spacer(Modifier.height(8.dp))
                         TextButton(onClick = { 
                           requestLocation()
-                           if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                           if (ctx.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
                            vm.setLocationMode(LocationMode.AUTO)
                         }
                     }) {
