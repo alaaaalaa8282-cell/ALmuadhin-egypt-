@@ -211,7 +211,12 @@ fun SettingsScreen(
                         )
                     } else {
                         Spacer(Modifier.height(8.dp))
-                        TextButton(onClick = { requestLocation() }) {
+                        TextButton(onClick = { 
+                          requestLocation()
+                           if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                           vm.setLocationMode(LocationMode.AUTO)
+                        }
+                    }) {
                             Icon(Icons.Default.MyLocation, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
                             Text("طلب صلاحية الموقع")
