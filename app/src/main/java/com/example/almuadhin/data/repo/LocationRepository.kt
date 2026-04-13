@@ -18,6 +18,7 @@ import kotlin.coroutines.resume
 class LocationRepository @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
+
     private val fused = LocationServices.getFusedLocationProviderClient(context)
 
     @SuppressLint("MissingPermission")
@@ -28,7 +29,7 @@ class LocationRepository @Inject constructor(
             if (last != null) {
                 last
             } else {
-                // لو null — اطلب موقع جديد
+                // اطلب موقع جديد لو null
                 getCurrentLocation()
             }
         } catch (e: Exception) {
@@ -55,4 +56,6 @@ class LocationRepository @Inject constructor(
             cont.invokeOnCancellation {
                 fused.removeLocationUpdates(callback)
             }
-        }
+        } // ← إغلاق suspendCancellableCoroutine
+
+} // ← إغلاق الكلاس
