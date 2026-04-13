@@ -53,7 +53,12 @@ fun QiblaScreen(
     var userLocation by remember { mutableStateOf<Location?>(null) }
     var azimuth by remember { mutableFloatStateOf(0f) }
     var qiblaDirection by remember { mutableFloatStateOf(0f) }
-    var hasPermission by remember { mutableStateOf(false) }
+    var hasPermission by remember {
+    mutableStateOf(
+        context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED ||
+        context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED
+    )
+  }   
     var sensorAccuracy by remember { mutableStateOf("جيدة") }
 
     val launcher = rememberLauncherForActivityResult(
