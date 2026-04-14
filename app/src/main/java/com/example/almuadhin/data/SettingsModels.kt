@@ -22,14 +22,16 @@ enum class AdhanSound(val resId: Int, val labelAr: String, val isFull: Boolean =
     ABDEL_BASET(R.raw.abdel_baset, "الشيخ عبد الباسط"),
     ABDEL_BASET_SAMAD(R.raw.abd_elbasit_abdel_samad, "الشيخ عبد الباسط عبد الصمد")
 }
+
 enum class SalahSound(val resId: Int, val labelAr: String) {
-    NOZAKER(R.raw.nozaker_salt_ala_habib, "نذكركم بالصلاة على الحبيب"),
+    NOZAKER(R.raw.nozaker_salt_ala_habib, "تذكرك بالصلاة على الحبيب"),
     AYAH(R.raw.ayah_elahzab, "آية الأحزاب")
 }
+
 data class UserSettings(
     val locationMode: LocationMode = LocationMode.AUTO,
-    val manualCity: String = "المنامة",
-    val manualCountry: String = "البحرين",
+    val manualCity: String = "",
+    val manualCountry: String = "",
     val calculationMethod: CalculationMethod = CalculationMethod.UMM_AL_QURA,
     val notificationsEnabled: Boolean = true,
     val adsRemoved: Boolean = false,
@@ -41,6 +43,7 @@ data class UserSettings(
     val salahSound: SalahSound = SalahSound.NOZAKER,
     val salahInterval: Int = 30,
 )
+
 data class PrayerDay(
     val imsak: String,
     val fajr: String,
