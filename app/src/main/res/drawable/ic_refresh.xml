@@ -1,90 +1,9 @@
-fun refresh() {
-    viewModelScope.launch {
-        _state.value = _state.value.copy(isLoading = true, error = null)
-        val s = settingsRepo.settingsFlow.first()
-        _state.value = _state.value.copy(settings = s)
-
-        val date = TimeUtils.todayDdMmYyyy(zoneId)
-
-        val day = runCatching {
-            if (s.locationMode == LocationMode.AUTO) {
-                val cachedLoc = settingsRepo.getLocationCache()
-                if (cachedLoc != null) {
-                    // استخدم الموقع المحفوظ
-                    prayerRepo.getPrayerDayByCoordinates(
-                        date, cachedLoc.first, cachedLoc.second, s.calculationMethod
-                    )
-                } else {
-                    // أول مرة — اجيب الموقع واحفظه
-                    val loc = locationRepo.getLastKnownLocation()
-                    if (loc != null) {
-                        val geocoder = android.location.Geocoder(context, java.util.Locale("ar"))
-                        val address = geocoder.getFromLocation(loc.latitude, loc.longitude, 1)
-                        val city = address?.firstOrNull()?.locality
-                            ?: address?.firstOrNull()?.subAdminArea
-                            ?: address?.firstOrNull()?.adminArea
-                            ?: ""
-                        settingsRepo.saveLocationCache(loc.latitude, loc.longitude, city)
-                        _state.value = _state.value.copy(cityName = city)
-                        prayerRepo.getPrayerDayByCoordinates(
-                            date, loc.latitude, loc.longitude, s.calculationMethod
-                        )
-                    } else {
-                        prayerRepo.getPrayerDayByCity(date, s.manualCity, s.manualCountry, s.calculationMethod)
-                    }
-                }
-            } else {
-                prayerRepo.getPrayerDayByCity(date, s.manualCity, s.manualCountry, s.calculationMethod)
-            }
-        }.getOrElse {
-            val cached = settingsRepo.storedPrayerDayFlow.first()
-            if (cached != null) {
-                _state.value = _state.value.copy(
-                    day = cached.second,
-                    isLoading = false,
-                    isOffline = true,
-                    lastUpdated = "آخر تحديث: ${cached.first}",
-                    error = null
-                )
-                computeNext(cached.second)
-            } else {
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    error = "لا يوجد اتصال ولا توجد بيانات محفوظة",
-                    isOffline = true
-                )
-            }
-            return@launch
-        }
-
-        settingsRepo.savePrayerDayForReschedule(TimeUtils.todayIso(zoneId), day)
-        settingsRepo.savePrayerUpdateDate(TimeUtils.todayIso(zoneId))
-
-        _state.value = _state.value.copy(
-            day = day,
-            isLoading = false,
-            isOffline = false,
-            lastUpdated = "تم التحديث الآن",
-            error = null
-        )
-        computeNext(day)
-
-        if (s.notificationsEnabled && scheduler.canScheduleExactAlarms()) {
-            scheduler.cancelAll()
-            scheduler.scheduleForToday(day, s.adhanSound.name, zoneId)
-        }
-
-        // كاش الأسبوع في الخلفية
-        launch {
-            runCatching {
-                if (s.locationMode == LocationMode.AUTO) {
-                    val cachedLoc = settingsRepo.getLocationCache()
-                    if (cachedLoc != null) {
-                        prayerRepo.fetchAndCacheWeek(cachedLoc.first, cachedLoc.second, s.calculationMethod)
-                    }
-                } else {
-                    prayerRepo.fetchAndCacheWeekByCity(s.manualCity, s.manualCountry, s.calculationMethod)
-                }
-            }
-        }
-    }
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#000000"
+        android:pathData="M17.65,6.35C16.2,4.9 14.21,4 12,4c-4.42,0 -7.99,3.58 -7.99,8s3.57,8 7.99,8c3.73,0 6.84,-2.55 7.73,-6h-2.08c-0.82,2.33 -3.04,4 -5.65,4 -3.31,0 -6,-2.69 -6,-6s2.69,-6 6,-6c1.66,0 3.14,0.69 4.22,1.78L13,11h7V4l-2.35,2.35z"/>
+</vector>
