@@ -523,7 +523,7 @@ fun SettingsScreen(
                 var zekrVolume by remember { mutableStateOf(ZekrPrefs.getVolume(zekrCtx)) }
                 var dhikrMenuExpanded by remember { mutableStateOf(false) }
                 var intervalMenuExpanded by remember { mutableStateOf(false) }
-                val intervals = listOf(10, 15, 20, 30, 60, 120)
+                val intervals = listOf(1, 5, 10, 15, 20, 30, 60, 120)
 
                 SettingsCard(
                     title = "الأذكار الصوتية 🤲",
