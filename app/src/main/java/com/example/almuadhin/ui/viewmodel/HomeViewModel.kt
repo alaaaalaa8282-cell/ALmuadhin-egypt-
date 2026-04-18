@@ -66,33 +66,33 @@ class HomeViewModel @Inject constructor(
      */
     private suspend fun loadCachedPrayerTimes() {
         // First check Room database for today's data
-       val day = if (cachedLoc != null) {
-    prayerRepo.getPrayerDayByCoordinates(date, cachedLoc.first, cachedLoc.second, s.calculationMethod)
-} else {
-    val loc = locationRepo.getLastKnownLocation()
-    if (loc != null) {
-        settingsRepo.saveLocationCache(loc.latitude, loc.longitude, "")
-        _state.value = _state.value.copy(cityName = "")
-        prayerRepo.getPrayerDayByCoordinates(date, loc.latitude, loc.longitude, s.calculationMethod)
-    } else {
-        prayerRepo.getPrayerDayByCity(date, s.manualCity, s.manualCountry, s.calculationMethod)
-    }
-}
-_state.value = _state.value.copy(
-    day = day,
-                    isLoading = false,
-                    isOffline = false,
-                    lastUpdated = "محفوظ مسبقاً",
-                    error = null
-                )
-                computeNext(day)
-            } catch (e: Exception) {
-                // Fallback to legacy DataStore cache
-                val cached = settingsRepo.storedPrayerDayFlow.first()
-                if (cached != null) {
-                    _state.value = _state.value.copy(
-                        day = cached.second,
-                        isLoading = false,
+       if (prayerRepo.hasCachedDataForToday()) {
+    val date = TimeUtils.todayDdMmYyyy(zoneId)
+    val s = settingsRepo.settingsFlow.first()
+    val day = try {
+        val cachedLoc = settingsRepo.getLocationCache()
+        if (cachedLoc != null) {
+            prayerRepo.getPrayerDayByCoordinates(date, cachedLoc.first, cachedLoc.second, s.calculationMethod)
+        } else {
+            val loc = locationRepo.getLastKnownLocation()
+            if (loc != null) {
+                val geocoder = android.location.Geocoder(context, java.util.Locale("ar"))
+                val address = geocoder.getFromLocation(loc.latitude, loc.longitude, 1)
+                val city = address?.firstOrNull()?.locality
+                    ?: address?.firstOrNull()?.subAdminArea
+                    ?: address?.firstOrNull()?.adminArea ?: ""
+                settingsRepo.saveLocationCache(loc.latitude, loc.longitude, city)
+                _state.value = _state.value.copy(cityName = city)
+                prayerRepo.getPrayerDayByCoordinates(date, loc.latitude, loc.longitude, s.calculationMethod)
+            } else {
+                prayerRepo.getPrayerDayByCity(date, s.manualCity, s.manualCountry, s.calculationMethod)
+            }
+        }
+    } catch (e: Exception) { null }
+
+    _state.value = _state.value.copy(
+        day = day,
+        isLoading = false,
                         isOffline = true,
                         lastUpdated = "محفوظ مسبقاً",
                         error = null
