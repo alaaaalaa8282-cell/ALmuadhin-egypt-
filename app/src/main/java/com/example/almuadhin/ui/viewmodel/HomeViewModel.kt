@@ -91,15 +91,13 @@ class HomeViewModel @Inject constructor(
     } catch (e: Exception) { null }
 
     _state.value = _state.value.copy(
-        day = day,
-        isLoading = false,
-                        isOffline = true,
-                        lastUpdated = "محفوظ مسبقاً",
-                        error = null
-                    )
-                    computeNext(cached.second)
-                }
-            }
+            day = day,
+            isLoading = false,
+            isOffline = false,
+            lastUpdated = "محفوظ مسبقاً",
+            error = null
+        )
+        computeNext(day)
         } else {
             // Fallback to legacy DataStore cache
             val cached = settingsRepo.storedPrayerDayFlow.first()
