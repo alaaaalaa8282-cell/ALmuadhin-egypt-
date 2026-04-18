@@ -554,12 +554,13 @@ item {
             Text("الفترة الزمنية بين الأذكار",
                 style = MaterialTheme.typography.bodySmall)
             Spacer(Modifier.height(4.dp))
+           var expanded2 by remember { mutableStateOf(false) }
+           
             ExposedDropdownMenuBox(
                 expanded = false,
                 onExpandedChange = {}
             ) {
-                var expanded2 by remember { mutableStateOf(false) }
-                OutlinedTextField(
+                    OutlinedTextField(
                     value = "$selectedInterval دقيقة",
                     onValueChange = {},
                     readOnly = true,
