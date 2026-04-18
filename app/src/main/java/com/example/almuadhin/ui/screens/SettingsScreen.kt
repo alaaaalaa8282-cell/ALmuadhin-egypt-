@@ -1003,5 +1003,5 @@ private fun NoorSettingsCard() {
             }
         }
     }
-}
+
 
