@@ -683,7 +683,7 @@ item {
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                     spacer(8.dp)
+                     Spacer(Modifier.height(8.dp))
                     Text(
                         "🕌 مواقيت الصلاة الدقيقة\n🧭 اتجاه القبلة\n📅 التقويم الهجري\n📿 الأذكار\n🌙 عداد رمضان",
                         style = MaterialTheme.typography.bodySmall,
