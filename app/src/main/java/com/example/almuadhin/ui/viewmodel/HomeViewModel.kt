@@ -73,7 +73,7 @@ class HomeViewModel @Inject constructor(
                 val cachedLoc = settingsRepo.getLocationCache()
 if (cachedLoc != null) {  //
     // استخدم الموقع المحفوظ بدون GPS
-    prayerRepo.getPrayerDayByCoordinates(date, cachedLoc.first, cachedLoc.second, s.calculationMethod)
+    val day = prayerRepo.getPrayerDayByCoordinates(date, cachedLoc.first, cachedLoc.second, s.calculationMethod)
 } else {
     // أول مرة بس — اجيب الموقع واحفظه
     val loc = locationRepo.getLastKnownLocation()
@@ -85,9 +85,9 @@ if (cachedLoc != null) {  //
             ?: address?.firstOrNull()?.adminArea ?: ""
         settingsRepo.saveLocationCache(loc.latitude, loc.longitude, city)
         _state.value = _state.value.copy(cityName = city)
-        prayerRepo.getPrayerDayByCoordinates(date, loc.latitude, loc.longitude, s.calculationMethod)
+        val day = prayerRepo.getPrayerDayByCoordinates(date, loc.latitude, loc.longitude, s.calculationMethod)
     } else {
-        prayerRepo.getPrayerDayByCity(date, s.manualCity, s.manualCountry, s.calculationMethod)
+        val day = prayerRepo.getPrayerDayByCity(date, s.manualCity, s.manualCountry, s.calculationMethod)
     }
 }
                 
