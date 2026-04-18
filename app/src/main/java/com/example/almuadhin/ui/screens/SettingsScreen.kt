@@ -663,8 +663,8 @@ item {
                 modifier = Modifier.fillMaxWidth(),
                 textAlign = TextAlign.Center)
         }
+        }
     }
-}
             // App Info
             item {
                 SettingsCard(
