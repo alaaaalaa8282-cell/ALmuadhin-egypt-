@@ -24,11 +24,11 @@ plugins {
 
 
 android {
-    namespace = "com.example.almuadhin.egypt"
+    namespace = "com.example.almuadhin"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.almuadhin.egypt"
+        applicationId = "com.example.almuadhin"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
