@@ -522,7 +522,7 @@ fun SettingsScreen(
                 var selectedRepeatIndex by remember { mutableStateOf(ZekrPrefs.getRepeatIndex(zekrCtx)) }
                 var dhikrMenuExpanded by remember { mutableStateOf(false) }
                 var intervalMenuExpanded by remember { mutableStateOf(false) }
-                val intervals = listOf(10, 15, 20, 30, 60, 120)
+                val intervals = listOf(1, 5, 10, 15, 20, 30, 60, 120)
 
                 var zekrVolume by remember {
                     mutableStateOf(
