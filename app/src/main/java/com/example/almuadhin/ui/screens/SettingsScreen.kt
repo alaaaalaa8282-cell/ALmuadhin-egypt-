@@ -2,6 +2,7 @@ package com.example.almuadhin.ui.screens
 
 import android.Manifest
 import android.content.Intent
+import android.media.AudioManager
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
@@ -43,13 +44,6 @@ import com.example.almuadhin.data.ZekrPrefs
 import com.example.almuadhin.alarm.ZekrScheduler
 import androidx.compose.ui.text.style.TextAlign
 
-// Hilt EntryPoint to access scheduler from composable
-@dagger.hilt.EntryPoint
-@dagger.hilt.InstallIn(dagger.hilt.components.SingletonComponent::class)
-interface SchedulerEntryPoint {
-    fun scheduler(): PrayerAlarmScheduler
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
@@ -69,7 +63,7 @@ fun SettingsScreen(
     var playingSound by remember { mutableStateOf<AdhanSound?>(null) }
 
     var playingSalahSound by remember { mutableStateOf<SalahSound?>(null) }
-
+  
     DisposableEffect(Unit) {
         onDispose {
             mediaPlayer?.release()
@@ -85,12 +79,10 @@ fun SettingsScreen(
     ) { /* handled by system */ }
 
     fun requestLocation() {
-        locationLauncher.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        )
+        locationLauncher.launch(arrayOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ))
     }
 
     fun requestNotifications() {
@@ -110,17 +102,19 @@ fun SettingsScreen(
 
     fun toggleAdhanPreview(sound: AdhanSound) {
         if (playingSound == sound) {
+            // Stop current
             mediaPlayer?.stop()
             mediaPlayer?.release()
             mediaPlayer = null
             playingSound = null
         } else {
+            // Play new
             mediaPlayer?.release()
             mediaPlayer = MediaPlayer.create(ctx, sound.resId).apply {
-                setOnCompletionListener {
+                setOnCompletionListener { 
                     release()
                     playingSound = null
-                    mediaPlayer = null
+                    mediaPlayer = null 
                 }
                 start()
             }
@@ -151,7 +145,8 @@ fun SettingsScreen(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.primary
                     )
-
+                    
+                    // App Icon
                     androidx.compose.foundation.Image(
                         painter = androidx.compose.ui.res.painterResource(id = com.example.almuadhin.R.drawable.icon),
                         contentDescription = "App Icon",
@@ -221,12 +216,12 @@ fun SettingsScreen(
                         )
                     } else {
                         Spacer(Modifier.height(8.dp))
-                        TextButton(onClick = {
-                            requestLocation()
-                            if (ctx.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                                vm.setLocationMode(LocationMode.AUTO)
-                            }
-                        }) {
+                        TextButton(onClick = { 
+                          requestLocation()
+                           if (ctx.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                           vm.setLocationMode(LocationMode.AUTO)
+                        }
+                    }) {
                             Icon(Icons.Default.MyLocation, contentDescription = null)
                             Spacer(Modifier.width(8.dp))
                             Text("طلب صلاحية الموقع")
@@ -331,7 +326,10 @@ fun SettingsScreen(
                                 }
                             }
 
-                            IconButton(onClick = { toggleAdhanPreview(sound) }) {
+                            // Play/Stop Button
+                            IconButton(
+                                onClick = { toggleAdhanPreview(sound) }
+                            ) {
                                 Icon(
                                     imageVector = if (playingSound == sound) Icons.Default.StopCircle else Icons.Default.PlayCircle,
                                     contentDescription = if (playingSound == sound) "إيقاف" else "تشغيل",
@@ -429,9 +427,9 @@ fun SettingsScreen(
                         }
                     }
                 }
-            }
-
-            // Silent Fajr Setting
+           }
+            
+// Silent Fajr Setting
             item {
                 SettingsCard(
                     title = "إعداد الفجر",
@@ -465,7 +463,6 @@ fun SettingsScreen(
                     }
                 }
             }
-
             // Ads Settings
             item {
                 SettingsCard(
@@ -513,162 +510,178 @@ fun SettingsScreen(
                 }
             }
 
-            // Zekr Settings
-            item {
-                val zekrCtx = LocalContext.current
-                var zekrEnabled by remember { mutableStateOf(ZekrPrefs.isEnabled(zekrCtx)) }
-                var selectedInterval by remember { mutableStateOf(ZekrPrefs.getIntervalInMinutes(zekrCtx)) }
-                var playbackMode by remember { mutableStateOf(ZekrPrefs.getPlaybackMode(zekrCtx)) }
-                var selectedRepeatIndex by remember { mutableStateOf(ZekrPrefs.getRepeatIndex(zekrCtx)) }
-                var zekrVolume by remember { mutableStateOf(ZekrPrefs.getVolume(zekrCtx)) }
-                var dhikrMenuExpanded by remember { mutableStateOf(false) }
-                var intervalMenuExpanded by remember { mutableStateOf(false) }
-                val intervals = listOf(1, 5, 10, 15, 20, 30, 60, 120)
+            // Noor AI Settings
+         //   item {
+        //        NoorSettingsCard()
+        //    }
+// Zekr Settings
+item {
+    val ctx = LocalContext.current
+    // ===== التعديل: AudioManager للتحكم الحقيقي في صوت الأذكار =====
+    val audioManager = remember { ctx.getSystemService(AudioManager::class.java) }
+    val maxVolume = remember { audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) }
 
-                SettingsCard(
-                    title = "الأذكار الصوتية 🤲",
-                    icon = Icons.Default.Favorite
+    var zekrEnabled by remember { mutableStateOf(ZekrPrefs.isEnabled(ctx)) }
+    var selectedInterval by remember { mutableStateOf(ZekrPrefs.getIntervalInMinutes(ctx)) }
+    var playbackMode by remember { mutableStateOf(ZekrPrefs.getPlaybackMode(ctx)) }
+    var selectedRepeatIndex by remember { mutableStateOf(ZekrPrefs.getRepeatIndex(ctx)) }
+    var dhikrMenuExpanded by remember { mutableStateOf(false) }
+    val intervals = listOf(10, 15, 20, 30, 60, 120)
+
+    // قراءة الصوت الحالي من الجهاز مباشرة (مش من ZekrPrefs)
+    var zekrVolume by remember {
+        mutableStateOf(
+            audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat() / maxVolume.toFloat()
+        )
+    }
+
+    SettingsCard(
+        title = "الأذكار الصوتية 🤲",
+        icon = Icons.Default.Favorite
+    ) {
+        // تفعيل
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(if (zekrEnabled) "الأذكار مفعلة ✅" else "الأذكار متوقفة 🔴",
+                fontWeight = FontWeight.Bold)
+            Switch(
+                checked = zekrEnabled,
+                onCheckedChange = { v ->
+                    zekrEnabled = v
+                    ZekrPrefs.setEnabled(ctx, v)
+                    if (v) ZekrScheduler.schedule(ctx, selectedInterval.toLong())
+                    else ZekrScheduler.cancel(ctx)
+                }
+            )
+        }
+
+        if (zekrEnabled) {
+            Spacer(Modifier.height(8.dp))
+
+            // الفترة الزمنية
+            Text("الفترة الزمنية بين الأذكار",
+                style = MaterialTheme.typography.bodySmall)
+            Spacer(Modifier.height(4.dp))
+           var expanded2 by remember { mutableStateOf(false) }
+           
+            ExposedDropdownMenuBox(
+                expanded = false,
+                onExpandedChange = {}
+            ) {
+                    OutlinedTextField(
+                    value = "$selectedInterval دقيقة",
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded2) },
+                    modifier = Modifier.menuAnchor().fillMaxWidth()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded2,
+                    onDismissRequest = { expanded2 = false }
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            if (zekrEnabled) "الأذكار مفعلة ✅" else "الأذكار متوقفة 🔴",
-                            fontWeight = FontWeight.Bold
-                        )
-                        Switch(
-                            checked = zekrEnabled,
-                            onCheckedChange = { v ->
-                                zekrEnabled = v
-                                ZekrPrefs.setEnabled(zekrCtx, v)
-                                if (v) ZekrScheduler.schedule(zekrCtx, selectedInterval.toLong())
-                                else ZekrScheduler.cancel(zekrCtx)
+                    intervals.forEach { min ->
+                        DropdownMenuItem(
+                            text = { Text("$min دقيقة") },
+                            onClick = {
+                                selectedInterval = min
+                                ZekrPrefs.setIntervalInMinutes(ctx, min)
+                                if (zekrEnabled) ZekrScheduler.schedule(ctx, min.toLong())
+                                expanded2 = false
                             }
-                        )
-                    }
-
-                    if (zekrEnabled) {
-                        Spacer(Modifier.height(8.dp))
-
-                        Text("الفترة الزمنية بين الأذكار", style = MaterialTheme.typography.bodySmall)
-                        Spacer(Modifier.height(4.dp))
-
-                        ExposedDropdownMenuBox(
-                            expanded = intervalMenuExpanded,
-                            onExpandedChange = { intervalMenuExpanded = it }
-                        ) {
-                            OutlinedTextField(
-                                value = "$selectedInterval دقيقة",
-                                onValueChange = {},
-                                readOnly = true,
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = intervalMenuExpanded) },
-                                modifier = Modifier
-                                    .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true)
-                                    .fillMaxWidth()
-                            )
-                            ExposedDropdownMenu(
-                                expanded = intervalMenuExpanded,
-                                onDismissRequest = { intervalMenuExpanded = false }
-                            ) {
-                                intervals.forEach { min ->
-                                    DropdownMenuItem(
-                                        text = { Text("$min دقيقة") },
-                                        onClick = {
-                                            selectedInterval = min
-                                            ZekrPrefs.setIntervalInMinutes(zekrCtx, min)
-                                            if (zekrEnabled) ZekrScheduler.schedule(zekrCtx, min.toLong())
-                                            intervalMenuExpanded = false
-                                        }
-                                    )
-                                }
-                            }
-                        }
-
-                        Spacer(Modifier.height(12.dp))
-
-                        Text("طريقة التشغيل", style = MaterialTheme.typography.bodySmall)
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                if (playbackMode == 0) "تسلسل (دور)" else "تكرار ذكر محدد",
-                                fontWeight = FontWeight.Bold
-                            )
-                            Switch(
-                                checked = playbackMode == 1,
-                                onCheckedChange = {
-                                    playbackMode = if (it) 1 else 0
-                                    ZekrPrefs.setPlaybackMode(zekrCtx, playbackMode)
-                                }
-                            )
-                        }
-
-                        if (playbackMode == 1) {
-                            Spacer(Modifier.height(8.dp))
-                            Text("اختر الذكر للتكرار", style = MaterialTheme.typography.bodySmall)
-                            ExposedDropdownMenuBox(
-                                expanded = dhikrMenuExpanded,
-                                onExpandedChange = { dhikrMenuExpanded = it }
-                            ) {
-                                OutlinedTextField(
-                                    value = if (selectedRepeatIndex < ZekrData.zekrList.size)
-                                        ZekrData.zekrList[selectedRepeatIndex].name
-                                    else "اختر ذكر...",
-                                    onValueChange = {},
-                                    readOnly = true,
-                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dhikrMenuExpanded) },
-                                    modifier = Modifier
-                                        .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true)
-                                        .fillMaxWidth()
-                                )
-                                ExposedDropdownMenu(
-                                    expanded = dhikrMenuExpanded,
-                                    onDismissRequest = { dhikrMenuExpanded = false }
-                                ) {
-                                    ZekrData.zekrList.forEachIndexed { index, zekr ->
-                                        DropdownMenuItem(
-                                            text = { Text(zekr.name) },
-                                            onClick = {
-                                                selectedRepeatIndex = index
-                                                ZekrPrefs.setRepeatIndex(zekrCtx, index)
-                                                dhikrMenuExpanded = false
-                                            }
-                                        )
-                                    }
-                                }
-                            }
-                        }
-
-                        Spacer(Modifier.height(12.dp))
-
-                        Text("مستوى الصوت 🔊", style = MaterialTheme.typography.bodySmall)
-                        Slider(
-                            value = zekrVolume,
-                            onValueChange = {
-                                zekrVolume = it
-                                ZekrPrefs.setVolume(zekrCtx, it)
-                            },
-                            valueRange = 0f..1f,
-                            steps = 9,
-                            colors = SliderDefaults.colors(
-                                thumbColor = MaterialTheme.colorScheme.primary,
-                                activeTrackColor = MaterialTheme.colorScheme.primary
-                            )
-                        )
-                        Text(
-                            "${(zekrVolume * 100).toInt()}%",
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center
                         )
                     }
                 }
             }
 
+            Spacer(Modifier.height(12.dp))
+
+            // طريقة التشغيل
+            Text("طريقة التشغيل",
+                style = MaterialTheme.typography.bodySmall)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(if (playbackMode == 0) "تسلسل (دور)" else "تكرار ذكر محدد",
+                    fontWeight = FontWeight.Bold)
+                Switch(
+                    checked = playbackMode == 1,
+                    onCheckedChange = {
+                        playbackMode = if (it) 1 else 0
+                        ZekrPrefs.setPlaybackMode(ctx, playbackMode)
+                    }
+                )
+            }
+
+            // اختيار ذكر للتكرار
+            if (playbackMode == 1) {
+                Spacer(Modifier.height(8.dp))
+                Text("اختر الذكر للتكرار",
+                    style = MaterialTheme.typography.bodySmall)
+                ExposedDropdownMenuBox(
+                    expanded = dhikrMenuExpanded,
+                    onExpandedChange = { dhikrMenuExpanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = if (selectedRepeatIndex < ZekrData.zekrList.size)
+                            ZekrData.zekrList[selectedRepeatIndex].name
+                        else "اختر ذكر...",
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = dhikrMenuExpanded) },
+                        modifier = Modifier.menuAnchor().fillMaxWidth()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = dhikrMenuExpanded,
+                        onDismissRequest = { dhikrMenuExpanded = false }
+                    ) {
+                        ZekrData.zekrList.forEachIndexed { index, zekr ->
+                            DropdownMenuItem(
+                                text = { Text(zekr.name) },
+                                onClick = {
+                                    selectedRepeatIndex = index
+                                    ZekrPrefs.setRepeatIndex(ctx, index)
+                                    dhikrMenuExpanded = false
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            // التحكم في الصوت - معدّل ليغير صوت الجهاز فعلاً
+            Text("مستوى الصوت 🔊",
+                style = MaterialTheme.typography.bodySmall)
+            Slider(
+                value = zekrVolume,
+                onValueChange = { newVal ->
+                    zekrVolume = newVal
+                    // تغيير صوت الجهاز فوراً
+                    val newStreamVolume = (newVal * maxVolume).toInt().coerceIn(0, maxVolume)
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newStreamVolume, 0)
+                    // حفظ القيمة عشان ZekrService يستخدمها
+                    ZekrPrefs.setVolume(ctx, newVal)
+                },
+                valueRange = 0f..1f,
+                steps = 9,
+                colors = SliderDefaults.colors(
+                    thumbColor = MaterialTheme.colorScheme.primary,
+                    activeTrackColor = MaterialTheme.colorScheme.primary
+                )
+            )
+            Text("${(zekrVolume * 100).toInt()}%",
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center)
+        }
+        }
+    }
             // App Info
             item {
                 SettingsCard(
@@ -687,7 +700,7 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-                    Spacer(Modifier.height(8.dp))
+                     Spacer(Modifier.height(8.dp))
                     Text(
                         "🕌 مواقيت الصلاة الدقيقة\n🧭 اتجاه القبلة\n📅 التقويم الهجري\n📿 الأذكار\n🌙 عداد رمضان",
                         style = MaterialTheme.typography.bodySmall,
@@ -699,37 +712,48 @@ fun SettingsScreen(
                     Spacer(Modifier.height(12.dp))
 
                     Text(
-                        "المطور: علاء محمد عبد العظيم ",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
+                         "المطور: علاء محمد عبد العظيم ",
+                         style = MaterialTheme.typography.titleSmall,
+                         fontWeight = FontWeight.Bold,
+                         color = MaterialTheme.colorScheme.primary
                     )
 
                     Spacer(Modifier.height(8.dp))
 
                     ElevatedCard(
-                        onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/msr7799"))
-                            ctx.startActivity(intent)
-                        },
-                        colors = CardDefaults.elevatedCardColors(
-                            containerColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(12.dp),
-                        modifier = Modifier.fillMaxWidth()
+                         onClick = {
+                             val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/msr7799"))
+                             ctx.startActivity(intent)
+                         },
+                         colors = CardDefaults.elevatedCardColors(
+                             containerColor = Color.White
+                         ),
+                         shape = RoundedCornerShape(12.dp),
+                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(12.dp)
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.BugReport,
-                                contentDescription = "Report Bug",
-                                tint = Color(0xFFE65100),
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Spacer(Modifier.width(12.dp))
-                            Column {}
+                             Icon(
+                                 imageVector = Icons.Default.BugReport,
+                                 contentDescription = "Report Bug",
+                                 tint = Color(0xFFE65100),
+                                 modifier = Modifier.size(24.dp)
+                             )
+                             Spacer(Modifier.width(12.dp))
+                             Column {
+                             //  Text(
+                                 //    "للإبلاغ عن عطل",
+                                  //   style = MaterialTheme.typography.titleSmall,
+                                 //    fontWeight = FontWeight.Bold
+                                //     )
+                                //   Text(
+                                 // "msr7799 (GitHub)", // GitHub Link
+                                 //    style = MaterialTheme.typography.bodySmall,
+                               //      color = MaterialTheme.colorScheme.onSurfaceVariant
+                               //  )
+                             }
                         }
                     }
                 }
@@ -740,7 +764,6 @@ fun SettingsScreen(
             }
         }
     }
-}
 
 @Composable
 private fun SettingsCard(
@@ -754,7 +777,9 @@ private fun SettingsCard(
         ),
         shape = RoundedCornerShape(20.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
@@ -777,6 +802,13 @@ private fun SettingsCard(
     }
 }
 
+// Hilt EntryPoint to access scheduler from composable
+@dagger.hilt.EntryPoint
+@dagger.hilt.InstallIn(dagger.hilt.components.SingletonComponent::class)
+interface SchedulerEntryPoint {
+    fun scheduler(): PrayerAlarmScheduler
+}
+
 @Composable
 fun spacer(height: Int) {
     Spacer(Modifier.height(height.dp))
@@ -790,7 +822,7 @@ fun spacer(height: androidx.compose.ui.unit.Dp) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun NoorSettingsCard() {
-    var selectedProvider by remember {
+    var selectedProvider by remember { 
         mutableStateOf(
             try { ApiProvider.valueOf(ConfigManager.get(ConfigManager.Keys.API_PROVIDER, "HUGGINGFACE")) }
             catch (e: Exception) { ApiProvider.HUGGINGFACE }
@@ -827,13 +859,14 @@ private fun NoorSettingsCard() {
                 )
             }
 
+            // Provider Selection
             Text(
                 "مزود الخدمة",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Spacer(Modifier.height(8.dp))
-
+            
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }
@@ -873,6 +906,7 @@ private fun NoorSettingsCard() {
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             Spacer(Modifier.height(16.dp))
 
+            // HuggingFace Token
             if (selectedProvider == ApiProvider.HUGGINGFACE) {
                 Text(
                     "HuggingFace Token",
@@ -889,7 +923,7 @@ private fun NoorSettingsCard() {
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = hfToken,
-                    onValueChange = {
+                    onValueChange = { 
                         hfToken = it
                         ConfigManager.set(ConfigManager.Keys.OPENAI_API_KEY, it)
                     },
@@ -897,9 +931,9 @@ private fun NoorSettingsCard() {
                     placeholder = { Text("hf_...") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    visualTransformation = if (showHfToken)
-                        androidx.compose.ui.text.input.VisualTransformation.None
-                    else
+                    visualTransformation = if (showHfToken) 
+                        androidx.compose.ui.text.input.VisualTransformation.None 
+                    else 
                         androidx.compose.ui.text.input.PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { showHfToken = !showHfToken }) {
@@ -916,6 +950,7 @@ private fun NoorSettingsCard() {
                 )
             }
 
+            // Google AI Studio API Key
             if (selectedProvider == ApiProvider.GOOGLE_AI_STUDIO) {
                 Text(
                     "Google AI Studio API Key",
@@ -932,7 +967,7 @@ private fun NoorSettingsCard() {
                 Spacer(Modifier.height(8.dp))
                 OutlinedTextField(
                     value = googleApiKey,
-                    onValueChange = {
+                    onValueChange = { 
                         googleApiKey = it
                         ConfigManager.set(ConfigManager.Keys.GOOGLE_STUDIO_API_KEY, it)
                     },
@@ -940,9 +975,9 @@ private fun NoorSettingsCard() {
                     placeholder = { Text("AIza...") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    visualTransformation = if (showGoogleKey)
-                        androidx.compose.ui.text.input.VisualTransformation.None
-                    else
+                    visualTransformation = if (showGoogleKey) 
+                        androidx.compose.ui.text.input.VisualTransformation.None 
+                    else 
                         androidx.compose.ui.text.input.PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { showGoogleKey = !showGoogleKey }) {
@@ -960,12 +995,13 @@ private fun NoorSettingsCard() {
             }
 
             Spacer(Modifier.height(12.dp))
-
+            
+            // Status indicator
             val isConfigured = when (selectedProvider) {
                 ApiProvider.HUGGINGFACE -> hfToken.isNotBlank()
                 ApiProvider.GOOGLE_AI_STUDIO -> googleApiKey.isNotBlank()
             }
-
+            
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -984,4 +1020,6 @@ private fun NoorSettingsCard() {
             }
         }
     }
-}
+ }
+
+    }
