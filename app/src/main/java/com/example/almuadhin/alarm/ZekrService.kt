@@ -90,7 +90,6 @@ class ZekrService : Service() {
                     AudioAttributes.Builder()
                         .setUsage(AudioAttributes.USAGE_MEDIA)
                         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
-                        .setLegacyStreamType(AudioManager.STREAM_MUSIC)
                         .build()
                 )
                 // التحكم في صوت الـ MediaPlayer مباشرة بدون تغيير صوت الجهاز
