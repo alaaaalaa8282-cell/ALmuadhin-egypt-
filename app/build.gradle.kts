@@ -28,7 +28,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.almuadhin"
+        applicationId = "com.example.almuadhin.pro"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
