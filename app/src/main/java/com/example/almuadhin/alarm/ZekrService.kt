@@ -4,11 +4,13 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.Service
+import android.content.Context
 import android.content.Intent
 import android.media.AudioAttributes
 import android.media.MediaPlayer
 import android.os.Build
 import android.os.IBinder
+import android.telephony.TelephonyManager
 import com.example.almuadhin.R
 import com.example.almuadhin.data.ZekrData
 import com.example.almuadhin.data.ZekrPrefs
@@ -30,6 +32,23 @@ class ZekrService : Service() {
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val ctx = applicationContext
+
+        // لو في مكالمة → أجّل الذكر 5 دقايق وامشي
+        val telephonyManager = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
+        if (telephonyManager.callState != TelephonyManager.CALL_STATE_IDLE) {
+            ZekrScheduler.schedule(ctx, 5)
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
+        // لو الأذان شغال → أجّل الذكر 5 دقايق وامشي
+        if (AzanMediaPlayer.player?.isPlaying == true) {
+            ZekrScheduler.schedule(ctx, 5)
+            stopSelf()
+            return START_NOT_STICKY
+        }
+
         startForeground(NOTIF_ID, buildNotification())
         playZekr()
         return START_NOT_STICKY
@@ -67,11 +86,8 @@ class ZekrService : Service() {
     private fun playZekr() {
         val ctx = applicationContext
         val playbackMode = ZekrPrefs.getPlaybackMode(ctx)
-
-        // قراءة مستوى الصوت من الإعدادات (0.0 - 1.0)
         val volumeFraction = ZekrPrefs.getVolume(ctx)
 
-        // تحديد ملف الصوت
         val resId = if (playbackMode == 1) {
             val repeatIndex = ZekrPrefs.getRepeatIndex(ctx)
             if (repeatIndex < ZekrData.zekrList.size)
@@ -92,7 +108,6 @@ class ZekrService : Service() {
                         .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
                         .build()
                 )
-                // التحكم في صوت الـ MediaPlayer مباشرة بدون تغيير صوت الجهاز
                 setVolume(volumeFraction, volumeFraction)
                 setOnCompletionListener {
                     it.release()
