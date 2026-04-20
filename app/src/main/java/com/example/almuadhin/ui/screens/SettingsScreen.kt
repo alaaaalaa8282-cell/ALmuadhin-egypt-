@@ -520,7 +520,7 @@ item {
     var selectedRepeatIndex by remember { mutableStateOf(ZekrPrefs.getRepeatIndex(ctx)) }
     var zekrVolume by remember { mutableStateOf(ZekrPrefs.getVolume(ctx)) }
     var dhikrMenuExpanded by remember { mutableStateOf(false) }
-    val intervals = listOf(10, 15, 20, 30, 60, 120)
+    val intervals = listOf(1, 5, 10, 15, 20, 30, 60, 120)
 
     SettingsCard(
         title = "الأذكار الصوتية 🤲",
