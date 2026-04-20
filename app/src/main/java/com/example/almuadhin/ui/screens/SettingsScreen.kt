@@ -654,6 +654,8 @@ fun SettingsScreen(
                             onValueChange = { newVal ->
                                 zekrVolume = newVal
                                 ZekrPrefs.setVolume(zekrCtx, newVal)
+                       val newStreamVolume = (newVal * maxVolume).toInt().coerceIn(0, maxVolume)
+                        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newStreamVolume, 0)
                             },
                             valueRange = 0f..1f,
                             colors = SliderDefaults.colors(
