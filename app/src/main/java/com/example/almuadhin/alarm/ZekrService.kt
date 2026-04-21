@@ -36,11 +36,11 @@ class ZekrService : Service() {
         val ctx = applicationContext
 
         // لو في مكالمة → أجّل الذكر 5 دقايق وامشي
-        val telephonyManager = ctx.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        if (telephonyManager.callState != TelephonyManager.CALL_STATE_IDLE) {
-            ZekrScheduler.schedule(ctx, 5)
+          if (isCallActive() || isAudioBusy() || isInCommunication()) {
+            scheduleNext(this)
             stopSelf()
             return START_NOT_STICKY
+        }
         }
 
         // لو الأذان شغال → أجّل الذكر 5 دقايق وامشي
