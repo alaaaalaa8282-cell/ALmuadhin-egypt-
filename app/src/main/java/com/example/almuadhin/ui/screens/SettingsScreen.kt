@@ -657,7 +657,7 @@ fun SettingsScreen(
                         valueRange = 0f..1f,
                         colors = SliderDefaults.colors(
                             thumbColor = MaterialTheme.colorScheme.primary,
-                            activeTrackColor = MaterialTheme.colorScheme.primary,,
+                            activeTrackColor = MaterialTheme.colorScheme.primary,
                             inactiveTrackColor = Color(0xFF2E4A2E)
                         ),
                         modifier = Modifier.fillMaxWidth()
