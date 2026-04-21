@@ -644,8 +644,8 @@ fun SettingsScreen(
                             }
                         }
 
-                        Text("🔊 مستوى الصوت", color = Color.White, fontSize = 14.sp)
-                        Text("${(zekrVolume * 100).toInt()}%", color = gold, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                        Text("🔊 مستوى الصوت", style = MaterialTheme.typography.bodySmall)
+                        Text("${(zekrVolume * 100).toInt()}%", style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.Bold)
                     }
 
                     Slider(
@@ -656,8 +656,8 @@ fun SettingsScreen(
                         },
                         valueRange = 0f..1f,
                         colors = SliderDefaults.colors(
-                            thumbColor = gold,
-                            activeTrackColor = gold,
+                            thumbColor = MaterialTheme.colorScheme.primary,
+                            activeTrackColor = MaterialTheme.colorScheme.primary,,
                             inactiveTrackColor = Color(0xFF2E4A2E)
                         ),
                         modifier = Modifier.fillMaxWidth()
