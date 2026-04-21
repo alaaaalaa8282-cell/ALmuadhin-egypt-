@@ -41,8 +41,7 @@ class ZekrService : Service() {
             stopSelf()
             return START_NOT_STICKY
         }
-        }
-
+        
         // لو الأذان شغال → أجّل الذكر 5 دقايق وامشي
         if (AzanMediaPlayer.player?.isPlaying == true) {
             ZekrScheduler.schedule(ctx, 5)
