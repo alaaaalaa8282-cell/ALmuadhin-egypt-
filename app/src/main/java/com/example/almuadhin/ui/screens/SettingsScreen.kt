@@ -513,9 +513,7 @@ fun SettingsScreen(
             // Zekr Settings
             item {
                 val zekrCtx = LocalContext.current
-                val audioManager = remember { zekrCtx.getSystemService(AudioManager::class.java) }
-                val maxVolume = remember { audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) }
-
+               
                 var zekrEnabled by remember { mutableStateOf(ZekrPrefs.isEnabled(zekrCtx)) }
                 var selectedInterval by remember { mutableStateOf(ZekrPrefs.getIntervalInMinutes(zekrCtx)) }
                 var playbackMode by remember { mutableStateOf(ZekrPrefs.getPlaybackMode(zekrCtx)) }
