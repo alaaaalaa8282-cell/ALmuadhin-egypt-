@@ -513,9 +513,7 @@ fun SettingsScreen(
             // Zekr Settings
             item {
                 val zekrCtx = LocalContext.current
-                val audioManager = remember { zekrCtx.getSystemService(AudioManager::class.java) }
-                val maxVolume = remember { audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC) }
-
+               
                 var zekrEnabled by remember { mutableStateOf(ZekrPrefs.isEnabled(zekrCtx)) }
                 var selectedInterval by remember { mutableStateOf(ZekrPrefs.getIntervalInMinutes(zekrCtx)) }
                 var playbackMode by remember { mutableStateOf(ZekrPrefs.getPlaybackMode(zekrCtx)) }
@@ -654,8 +652,7 @@ fun SettingsScreen(
                             onValueChange = { newVal ->
                                 zekrVolume = newVal
                                 ZekrPrefs.setVolume(zekrCtx, newVal)
-                       val newStreamVolume = (newVal * maxVolume).toInt().coerceIn(0, maxVolume)
-                        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, newStreamVolume, 0)
+                       
                             },
                             valueRange = 0f..1f,
                             colors = SliderDefaults.colors(
