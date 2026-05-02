@@ -6,6 +6,6 @@ import android.content.Intent
 
 class ZekrReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        context.startService(Intent(context, ZekrService::class.java))
+        // placeholder - ZekrService غير موجود حالياً
     }
 }
