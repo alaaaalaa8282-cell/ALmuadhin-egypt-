@@ -4,27 +4,56 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:gravity="center"
-    android:background="#000000">
+    android:background="#1a1a2e"
+    android:padding="24dp">
 
-    <ImageView
-        android:layout_width="250dp"
-        android:layout_height="250dp"
-        android:src="@mipmap/ic_launcher_foreground"
-        android:scaleType="centerCrop"/>
+    <!-- النجمة أو الهلال -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🕌"
+        android:textSize="72sp"
+        android:layout_marginBottom="16dp"/>
 
+    <!-- حان وقت الصلاة -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="حان وقت الصلاة"
+        android:textColor="#FFD700"
+        android:textSize="22sp"
+        android:layout_marginBottom="8dp"
+        android:fontFamily="sans-serif-medium"/>
+
+    <!-- اسم الصلاة -->
     <TextView
         android:id="@+id/tvPrayerName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF"
-        android:textSize="28sp"
-        android:layout_marginTop="24dp"/>
+        android:textSize="42sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
 
-    <Button
-        android:id="@+id/btnDismiss"
+    <!-- الله أكبر -->
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="الله أكبر"
+        android:textColor="#A0C4FF"
+        android:textSize="20sp"
+        android:layout_marginBottom="48dp"/>
+
+    <!-- زرار إغلاق الأذان -->
+    <Button
+        android:id="@+id/btnDismiss"
+        android:layout_width="220dp"
+        android:layout_height="56dp"
         android:text="إغلاق الأذان"
-        android:layout_marginTop="32dp"/>
+        android:textSize="18sp"
+        android:backgroundTint="#FFD700"
+        android:textColor="#1a1a2e"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"/>
 
 </LinearLayout>
