@@ -41,6 +41,7 @@ import dagger.hilt.android.EntryPointAccessors
 import com.example.almuadhin.data.ZekrData
 import com.example.almuadhin.data.ZekrPrefs
 import com.example.almuadhin.alarm.ZekrScheduler
+import androidx.compose.ui.text.style.TextAlign
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
