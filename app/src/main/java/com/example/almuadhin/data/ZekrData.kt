@@ -16,5 +16,5 @@ object ZekrData {
         Zekr("سبحان الله وبحمده سبحان الله العظيم")
     )
 
-    val sobhanallah_wabehemden = SalahSound.SOBHANALLAH
+    val sobhanallah_wabehemden = "سبحان الله وبحمده"
 }
