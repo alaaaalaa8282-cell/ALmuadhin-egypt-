@@ -7,20 +7,7 @@
     android:background="#1a1a2e"
     android:padding="24dp">
 
-    <!-- صورة الخلفية بشفافية -->
-<ImageView
-    android:id="@+id/father_bg"
-    android:layout_width="0dp"
-    android:layout_height="0dp"
-    android:src="@drawable/father_bg"
-    android:scaleType="centerCrop"
-    android:alpha="0.18"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"/>
-   
-    <!-- النجمة أو الهلال -->
+   <!-- النجمة أو الهلال -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
