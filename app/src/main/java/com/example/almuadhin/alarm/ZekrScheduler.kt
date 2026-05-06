@@ -1,31 +1,41 @@
 package com.example.almuadhin.alarm
 
-import android.app.AlarmManager
-import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.media.MediaPlayer
+import com.example.almuadhin.data.ZekrData
+import com.example.almuadhin.data.ZekrPrefs
 
-object ZekrScheduler {
-    fun schedule(ctx: Context, minutes: Long) {
-        val intent = Intent(ctx, ZekrReceiver::class.java)
-        val pi = PendingIntent.getBroadcast(
-            ctx, 3001, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        val alarmManager = ctx.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            System.currentTimeMillis() + minutes * 60 * 1000,
-            pi
-        )
-    }
+class ZekrReceiver : BroadcastReceiver() {
 
-    fun cancel(ctx: Context) {
-        val intent = Intent(ctx, ZekrReceiver::class.java)
-        val pi = PendingIntent.getBroadcast(
-            ctx, 3001, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-        (ctx.getSystemService(Context.ALARM_SERVICE) as AlarmManager).cancel(pi)
+    override fun onReceive(context: Context, intent: Intent) {
+        if (!ZekrPrefs.isEnabled(context)) return
+
+        val playbackMode = ZekrPrefs.getPlaybackMode(context)
+        val zekr = if (playbackMode == 1) {
+            val index = ZekrPrefs.getRepeatIndex(context)
+            if (index < ZekrData.zekrList.size) ZekrData.zekrList[index]
+            else ZekrData.zekrList[0]
+        } else {
+            val index = ZekrPrefs.nextZekrIndex(context)
+            ZekrData.zekrList[index]
+        }
+
+        try {
+            val volume = ZekrPrefs.getVolume(context)
+            val mediaPlayer = MediaPlayer.create(context, zekr.resId)
+            mediaPlayer?.apply {
+                setVolume(volume, volume)
+                setOnCompletionListener { release() }
+                start()
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        // ← إعادة الجدولة للمرة الجاية
+        val intervalMinutes = ZekrPrefs.getIntervalInMinutes(context)
+        ZekrScheduler.schedule(context, intervalMinutes.toLong())
     }
 }
