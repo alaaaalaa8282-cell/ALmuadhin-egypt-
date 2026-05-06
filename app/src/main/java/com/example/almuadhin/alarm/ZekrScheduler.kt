@@ -29,9 +29,3 @@ object ZekrScheduler {
         (ctx.getSystemService(Context.ALARM_SERVICE) as AlarmManager).cancel(pi)
     }
 }
-
-        // ← إعادة الجدولة للمرة الجاية
-        val intervalMinutes = ZekrPrefs.getIntervalInMinutes(context)
-        ZekrScheduler.schedule(context, intervalMinutes.toLong())
-    }
-}
