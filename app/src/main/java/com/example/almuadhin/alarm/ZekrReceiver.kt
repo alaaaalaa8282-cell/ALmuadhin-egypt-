@@ -33,5 +33,9 @@ class ZekrReceiver : BroadcastReceiver() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+
+        // ← إعادة الجدولة للمرة الجاية
+        val intervalMinutes = ZekrPrefs.getIntervalInMinutes(context)
+        ZekrScheduler.schedule(context, intervalMinutes.toLong())
     }
 }
