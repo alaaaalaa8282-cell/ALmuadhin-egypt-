@@ -50,13 +50,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-   <activity
-            android:name=".ui.screens.AzanFullScreenActivity"
-            android:exported="false"
-            android:showWhenLocked="true"
-            android:turnScreenOn="true"
-            android:theme="@style/Theme.Muadhin" />
-
+   
+            <activity
+    android:name=".ui.screens.AzanFullscreenActivity"
+    android:exported="false"
+    android:showWhenLocked="true"
+    android:turnScreenOn="true"
+    android:excludeFromRecents="true"
+    android:taskAffinity=""
+    android:launchMode="singleInstance"
+    android:theme="@style/Theme.Muadhin" />
 
         <receiver
             android:name=".alarm.BootReceiver"
