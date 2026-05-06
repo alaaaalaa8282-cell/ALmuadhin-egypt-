@@ -10,7 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.example.almuadhin.R
 import com.example.almuadhin.data.AdhanSound
-import com.example.almuadhin.ui.screens.AzanFullScreenActivity
+import com.example.almuadhin.ui.screens.AzanFullscreenActivity
 import android.telephony.TelephonyManager
 
 class AlarmReceiver : BroadcastReceiver() {
@@ -18,12 +18,13 @@ class AlarmReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val telephonyManager = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
         if (telephonyManager.callState != TelephonyManager.CALL_STATE_IDLE) return
-   
+
         val title = intent.getStringExtra(EXTRA_TITLE) ?: context.getString(R.string.notif_prayer_title)
         val body = intent.getStringExtra(EXTRA_BODY) ?: context.getString(R.string.notif_prayer_body)
         val adhanSoundName = intent.getStringExtra(EXTRA_ADHAN_SOUND) ?: AdhanSound.MAKKAH.name
         val notifId = intent.getIntExtra(EXTRA_ID, 1001)
         val isSilent = intent.getBooleanExtra(EXTRA_IS_SILENT, false)
+
         val adhanSound = try {
             AdhanSound.valueOf(adhanSoundName)
         } catch (e: Exception) {
@@ -38,12 +39,16 @@ class AlarmReceiver : BroadcastReceiver() {
             mp?.setOnCompletionListener {
                 it.release()
                 AzanMediaPlayer.player = null
+                // ← هنا التعديل: إشارة للشاشة إن الأذان خلص
+                context.sendBroadcast(
+                    Intent("com.example.almuadhin.ATHAN_COMPLETE")
+                )
             }
         }
 
         NotificationHelper.ensureChannels(context, adhanSound)
 
-        val openIntent = Intent(context, AzanFullScreenActivity::class.java).apply {
+        val openIntent = Intent(context, AzanFullscreenActivity::class.java).apply {
             putExtra("prayer_name", title)
             putExtra("notif_id", notifId)
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -80,7 +85,7 @@ class AlarmReceiver : BroadcastReceiver() {
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setSound(null)
             .setFullScreenIntent(fullScreenPi, true)
-            .addAction(0, "إغلاق الأذان", dismissPi)
+            .addAction(0, "إيقاف الأذان", dismissPi)
             .build()
 
         NotificationManagerCompat.from(context).notify(notifId, notif)
