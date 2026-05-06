@@ -1,20 +1,15 @@
 package com.example.almuadhin.data
 
-data class Zekr(val name: String, val audio: String = "")
+import com.example.almuadhin.R
+
+data class Zekr(val name: String, val resId: Int)
 
 object ZekrData {
     val zekrList = listOf(
-        Zekr("سبحان الله", "sobhanallah_wabehamdeh"),
-        Zekr("الحمد لله", "alhamdo_lelah"),
-        Zekr("لا إله إلا الله", ""),
-        Zekr("الله اكبر", ""),
-        Zekr("سبحان الله وبحمده", "sobhanallah_wabehamdeh"),
-        Zekr("سبحان الله العظيم", ""),
-        Zekr("استغفر الله", ""),
-        Zekr("لا حول ولا قوة إلا بالله", "lahawla_wlaqowat"),
-        Zekr("اللهم صل على محمد", "nozaker_salt_ala_habib"),
-        Zekr("سبحان الله وبحمده سبحان الله العظيم", "sobhanallah_wabehamdeh")
+        Zekr("سبحان الله وبحمده",        R.raw.sobhanallah_wabehamdeh),
+        Zekr("الحمد لله",                R.raw.alhamdo_lelah),
+        Zekr("اللهم لك الحمد",           R.raw.allahom_lk_alhamd),
+        Zekr("لا حول ولا قوة إلا بالله", R.raw.lahawla_wlaqowat),
+        Zekr("ربنا اغفر لي",             R.raw.rbna_ighfer_li)
     )
-
-    val sobhanallah_wabehemden = "سبحان الله وبحمده"
 }
