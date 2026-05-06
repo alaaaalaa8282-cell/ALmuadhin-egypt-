@@ -1,59 +1,139 @@
 package com.example.almuadhin.ui.screens
 
+import android.app.KeyguardManager
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.media.AudioManager
+import android.media.MediaPlayer
 import android.os.Build
 import android.os.Bundle
-import android.provider.Settings
-import android.telephony.TelephonyManager
+import android.os.Handler
+import android.os.Looper
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.almuadhin.R
-import com.example.almuadhin.alarm.AzanMediaPlayer
-import androidx.core.app.NotificationManagerCompat
-class AzanFullScreenActivity : AppCompatActivity() {
+
+class AzanFullscreenActivity : AppCompatActivity() {
+
+    private var mediaPlayer: MediaPlayer? = null
+    private val autoHandler = Handler(Looper.getMainLooper())
+
+    // Receiver لما الأذان يخلص تلقائي
+    private val athanCompleteReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            closeScreen()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // إظهار على شاشة القفل وتشغيل الشاشة
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            setShowWhenLocked(true)
+            setTurnScreenOn(true)
+            val km = getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+            km.requestDismissKeyguard(this, null)
+        } else {
+            @Suppress("DEPRECATION")
+            window.addFlags(
+                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
+                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
+                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+            )
+        }
+
         setContentView(R.layout.activity_azan_fullscreen)
 
-        // طلب إذن الظهور فوق التطبيقات
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!Settings.canDrawOverlays(this)) {
-                val intent = Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION)
-                startActivity(intent)
-                finish()
-                return
+        val prayerName = intent.getStringExtra("prayer_name") ?: "الصلاة"
+        val soundResId = intent.getIntExtra("sound_res_id", -1)
+
+        // ضبط النصوص
+        findViewById<TextView>(R.id.prayer_name_text).text = prayerName
+        findViewById<TextView>(R.id.athan_text).text = "حان وقت صلاة $prayerName"
+
+        // زر الإيقاف
+        findViewById<Button>(R.id.stop_athan_button).setOnClickListener {
+            closeScreen()
+        }
+
+        // تشغيل الأذان
+        if (soundResId != -1) {
+            playAdhan(soundResId)
+        }
+
+        // إغلاق تلقائي بعد 10 دقائق لو ما حدش ضغط
+        autoHandler.postDelayed({ closeScreen() }, 10 * 60 * 1000L)
+    }
+
+    private fun playAdhan(resId: Int) {
+        try {
+            // ضبط مستوى الصوت على الأعلى للأذان
+            val audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
+            audioManager.setStreamVolume(
+                AudioManager.STREAM_MUSIC,
+                audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC),
+                0
+            )
+
+            mediaPlayer = MediaPlayer.create(this, resId)
+            mediaPlayer?.apply {
+                setOnCompletionListener {
+                    // الأذان خلص تلقائي — اقفل الشاشة
+                    closeScreen()
+                }
+                start()
             }
-        }
-
-        window.addFlags(
-            WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON or
-            WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD or
-            WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED or
-            WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or
-            WindowManager.LayoutParams.FLAG_FULLSCREEN
-        )
-
-        // مش يشتغل أثناء المكالمات
-        val telephony = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-        if (telephony.callState != TelephonyManager.CALL_STATE_IDLE) {
-            finish()
-            return
-        }
-
-        val prayerName = intent.getStringExtra("prayer_name") ?: ""
-        findViewById<TextView>(R.id.tvPrayerName).text = prayerName
-
-        findViewById<Button>(R.id.btnDismiss).setOnClickListener {
-    AzanMediaPlayer.player?.stop()
-    AzanMediaPlayer.player?.release()
-    AzanMediaPlayer.player = null
-    val notifId = intent.getIntExtra("notif_id", 1001)
-    NotificationManagerCompat.from(this).cancel(notifId)
-    finish()
-}
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
     }
+
+    private fun closeScreen() {
+        // وقف الصوت
+        try {
+            mediaPlayer?.stop()
+            mediaPlayer?.release()
+            mediaPlayer = null
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        autoHandler.removeCallbacksAndMessages(null)
+
+        // ده هو السر — مش بيرجع للتطبيق
+        // بيرجع للحالة اللي كانت قبل الأذان
+        finishAndRemoveTask()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        registerReceiver(
+            athanCompleteReceiver,
+            IntentFilter("com.example.almuadhin.ATHAN_COMPLETE")
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        try { unregisterReceiver(athanCompleteReceiver) } catch (e: Exception) {}
+    }
+
+    override fun onDestroy() {
+        autoHandler.removeCallbacksAndMessages(null)
+        mediaPlayer?.release()
+        mediaPlayer = null
+        super.onDestroy()
+    }
+
+    // منع زر Back من الرجوع للتطبيق
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        closeScreen()
+    }
+}
