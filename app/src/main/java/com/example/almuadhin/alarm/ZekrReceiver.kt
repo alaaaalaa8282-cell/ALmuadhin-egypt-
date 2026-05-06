@@ -12,7 +12,6 @@ class ZekrReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (!ZekrPrefs.isEnabled(context)) return
 
-        // 1. اختيار الذكر
         val playbackMode = ZekrPrefs.getPlaybackMode(context)
         val zekr = if (playbackMode == 1) {
             val index = ZekrPrefs.getRepeatIndex(context)
@@ -23,21 +22,11 @@ class ZekrReceiver : BroadcastReceiver() {
             ZekrData.zekrList[index]
         }
 
-        // 2. لو الذكر ده معهوش صوت، تخطى
-        if (zekr.audio.isEmpty()) return
-
-        // 3. جيب الـ resource ID من اسم الملف
-        val resId = context.resources.getIdentifier(
-            zekr.audio, "raw", context.packageName
-        )
-        if (resId == 0) return
-
-        // 4. شغل الصوت بالمستوى المحفوظ من السلايدر
         try {
-            val volume = ZekrPrefs.getVolume(context) // 0.0f - 1.0f
-            val mediaPlayer = MediaPlayer.create(context, resId)
+            val volume = ZekrPrefs.getVolume(context)
+            val mediaPlayer = MediaPlayer.create(context, zekr.resId)
             mediaPlayer?.apply {
-                setVolume(volume, volume) // ← هنا السلايدر بيأثر فعلاً
+                setVolume(volume, volume)
                 setOnCompletionListener { release() }
                 start()
             }
